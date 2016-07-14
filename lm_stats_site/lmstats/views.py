@@ -4,7 +4,7 @@ from django.shortcuts import render, render_to_response, RequestContext
 def my_view(request):
     a = range(1, 10)
     b = 'string'
-    c = 32
+    c = 33
     contenido = {
         'titulo' : 'Mi primer gran articulo',
         'autor' : 'Carlos Picca',

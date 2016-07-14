@@ -21,5 +21,4 @@ admin.autodiscover()
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^demo/', 'lmstats.views.my_view'),
-    
 ]

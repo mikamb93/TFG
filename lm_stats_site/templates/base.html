@@ -1,0 +1,60 @@
+{% load staticfiles %}
+<html>
+<head>
+<link rel="stylesheet" href="{% static 'lmstats/style.css' %}">
+<title>BetEtsii</title>
+</head>
+<body>
+	<div id="centrado">
+		<header>
+
+			<h1 id="titulo">BetEtsii</h1>
+			<h2 id="descripcion">DESCRIPCION DE LA WEB</h2>
+
+			<div id="logotipo">LOGOTIPO</div>
+			<nav>
+				<ul id="menu-bar">
+					<li class="active"><a href="#">Partidos Analizados</a></li>
+					<li><a href="#">Mis Pronosticos</a></li>
+					<li><a href="#">Ranking de Usuarios</a></li>
+				</ul>
+			</nav>
+		</header>
+		<div id="contenido">
+			<table>
+				<tr>
+					<td><strong>Partido</strong></td>
+					<td><strong>%1</strong></td>
+					<td><strong>%X</strong></td>
+					<td><strong>%2</strong></td>
+				</tr>
+				{% for partido,porcentaje in datos %}
+				<tr>
+					<td><strong>{{ partido }}</strong></td>
+					<td><strong>{{ porcentaje.0 }}</strong></td>
+					<td><strong>{{ porcentaje.1 }}</strong></td>
+					<td><strong>{{ porcentaje.2 }}</strong></td>
+				</tr>
+				{% endfor %}
+			</table>
+			<section id="izquierda">
+				<h2>Ultimas Novedades</h2>
+				<article>NOVEDAD UNO</article>
+				<article>NOVEDAD DOS</article>
+				<article>NOVEDAD TRES</article>
+			</section>
+			<section id="centro">
+				<h2>Temas Populares</h2>
+				<article>POPULAR A</article>
+				<article>POPULAR B</article>
+				<article>POPULAR C</article>
+			</section>
+		</div>
+		<footer>
+			<section id="copyright">Datos Copyright</section>
+			<section id="contacto">Datos de Contacto</section>
+			<section id="enlaces">MapaWeb, Politica, etc.</section>
+		</footer>
+	</div>
+</body>
+</html>

@@ -1,15 +1,25 @@
+{% load staticfiles %}
 <html>
-	<head>
-		<title>My Page</title>
-	</head>
-	<body>
-		<h1 id="my_h1">DEMO PAGE</h1>
-		<div class="container">
-			<h1>Primer Blog</h1>
-			<h2>{{ titulo }}</h2>
-	
-			<h3>Publicado el {{ dia }} por {{ autor }}</h3>
-			<p>{{ contenido }}</p>
+<head>
+
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+<link rel="stylesheet" href="{% static 'lmstats/style.css' %}" >
+<title>My Page</title>
+</head>
+<body>
+	<h1 id="my_h1">DEMO PAGE</h1>
+	<div class="container">
+		<h1>Mi primer blog</h1>
+		<hr />
+		{% for usuario in usuarios %}
+		<div class="art">
+			<h2>{{ usuario[0] }}</h2>
+			<h3>Publicado el {{ usuario[1] }} por {{ usuario[2] }}</h3>
+			<p>{{ usuario }}</p>
 		</div>
-	</body>
+		<hr />
+		{% endfor %}
+	</div>
+</body>
 </html>

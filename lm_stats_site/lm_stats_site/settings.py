@@ -118,7 +118,7 @@ LANGUAGE_CODE = 'es'
 
 
 
-TIME_ZONE = 'UTC+2'
+TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -131,3 +131,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
+# STATICFILES_DIRS = ['lmstats/static',]
+#STATIC_ROOT = ('lmstats/static')

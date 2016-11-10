@@ -4,6 +4,10 @@ from MySQLdb.constants.FLAG import NOT_NULL, AUTO_INCREMENT
 from django.db.models.fields import Field
 from datetime import datetime
 import lmstats
+from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+from lm_stats_site import settings
+
 
 # Create your models here.
 
@@ -30,6 +34,7 @@ class Partido(models.Model):
     idpartido = models.AutoField(primary_key=True)
     fechapartido = models.DateField(db_column='fechaPartido', blank=True, null=True)  # Field name made lowercase.
     horapartido = models.TimeField(db_column='horaPartido', blank=True, null=True)  # Field name made lowercase.
+    jornada = models.IntegerField(blank=True, null=True)
     equipo1 = models.CharField(max_length=45, blank=True, null=True)
     equipo2 = models.CharField(max_length=45, blank=True, null=True)
     porcentaje1 = models.FloatField(blank=True, null=True)
@@ -67,18 +72,20 @@ class Usuario(models.Model):
 
 
 class Apuesta(models.Model):
+
+    
+    
     
     idapuesta = models.AutoField(primary_key=True)
-    usuario_idusuario = models.ForeignKey('Usuario', models.DO_NOTHING, db_column='usuario_idUsuario')  # Field name made lowercase.
+    usuario_idusuario = models.ForeignKey('AuthUser', models.DO_NOTHING, db_column='idusuario')  # Field name made lowercase.
     partido_idpartido = models.ForeignKey('Partido', models.DO_NOTHING, db_column='partido_idpartido')
     pronostico = models.CharField(max_length=45, blank=True, null=True)
-    fecha = datetime.now()
-    acierto_fallo = models.IntegerField(db_column='acierto/fallo', blank=True, null=True)  # Field renamed to remove unsuitable characters.
+    fecha = datetime.now().date()
+    acierto_fallo = models.BooleanField(db_column='acierto/fallo', default=False)  # Field renamed to remove unsuitable characters.
     
-    apuesta1 = Usuario.objects.get(idusuario=1)
     
     def __str__(self):
-        return Usuario.objects.get(idusuario=self.usuario_idusuario.idusuario).__str__() + ' : '+ Partido.objects.get(idpartido=self.partido_idpartido.idpartido).equipo1 +' '+ self.pronostico +' '+ Partido.objects.get(idpartido=self.partido_idpartido.idpartido).equipo2
+        return AuthUser.objects.get(idusuario=self.usuario_idusuario.idusuario).__str__() + ' : '+ Partido.objects.get(idpartido=self.partido_idpartido.idpartido).equipo1 +' '+ self.pronostico +' '+ Partido.objects.get(idpartido=self.partido_idpartido.idpartido).equipo2
         
 
 
@@ -98,6 +105,8 @@ class DjangoContentType(models.Model):
 
 
 class AuthUser(models.Model):
+    REQUIRED_FIELDS = ('username','password','first_name','last_name','email')
+    idusuario = models.CharField(max_length=128,db_column='id',primary_key=True)
     password = models.CharField(max_length=128)
     last_login = models.DateTimeField(blank=True, null=True)
     is_superuser = models.IntegerField()
@@ -109,6 +118,9 @@ class AuthUser(models.Model):
     is_active = models.IntegerField()
     date_joined = models.DateTimeField()
 
+    def __str__(self):
+        return self.username
+    
     class Meta:
         managed = False
         db_table = 'auth_user'
@@ -179,6 +191,4 @@ class AuthGroupPermissions(models.Model):
         managed = False
         db_table = 'auth_group_permissions'
         unique_together = (('group', 'permission'),)
-
-
 

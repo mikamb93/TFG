@@ -1,8 +1,9 @@
-from django.shortcuts import render, render_to_response, RequestContext
+from django.shortcuts import render, render_to_response, RequestContext,\
+    redirect
 from lmstats.forms import UsuarioForm
 from django.http import HttpResponseRedirect
-from django.core.context_processors import csrf
-from lmstats.models import Usuario
+from django.template.context_processors import csrf
+from lmstats.models import *
 import requests
 import urllib, json
 import urllib.request
@@ -11,38 +12,83 @@ import numpy as np
 from sklearn.cross_validation import train_test_split
 from sklearn.ensemble import RandomForestClassifier as RFC
 import time
-from _datetime import datetime
+from datetime import datetime as dt
+import datetime
 from lmstats import clasificador
+from django.http.response import HttpResponse
+from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect,\
+    requires_csrf_token
+from django.contrib.auth.models import AnonymousUser
+from django.template.defaultfilters import default
 
 
 
 
 
 # Create your views here.
+@ensure_csrf_cookie
 def my_view(request):
 
-#    entradas = Usuario.objects.all()[:10]
-    rfc = clasificador.seleccionaMejorRFC(5)
     partidosJornada = partidosJornadaActual('1')
     porcentajes = []
     partidos = []
     datos = []
+    
+#    p = Partido(idpartido=123,fechapartido=datetime.today(),horapartido=datetime.time(datetime.now()),equipo1='Betis',equipo2='Celta',porcentaje1=50,porcentajex=20,porcentaje2=30,competicion='Liga',resultado=None)
+#    p.save()
     for partido in partidosJornada:
-        detallespartido=detallesPartido(str(partido['id']))
-        if (int(partido['round']) in [1, 2, 3, 4, 5]):      
-            porcPartido = [detallespartido['forecast']['1'], detallespartido['forecast']['X'], detallespartido['forecast']['2']]
-            porcentajes.append(porcPartido)
+        if (len(Partido.objects.filter(idpartido=int(partido['id']))) == 0):
+            
+            detallespartido=detallesPartido(str(partido['id']))
+            if (int(partido['round']) in [1, 2, 3, 4, 5]):
+                porc1 = detallespartido['forecast']['1']
+                porcX = detallespartido['forecast']['X']
+                porc2 = detallespartido['forecast']['2']
+                diferencia = 100 - (int(porc1)+int(porcX)+int(porc2))
+                porcXnuevo = int(porcX) + diferencia
+                porcPartido = [str(porc1), str(porcXnuevo),str(porc2)]
+                porcentajes.append(porcPartido)
+            else:
+                rfc = clasificador.seleccionaMejorRFC(10)
+                estadisticasConRes = statsPartido(partido['id'], partido['year'])
+                estadisticasSinRes = estadisticasConRes[:len(estadisticasConRes) - 1]
+                probabilidades = rfc.predict_proba(estadisticasSinRes)
+                porcPartido = [probabilidades[0][0] * 100, probabilidades[0][2] * 100, probabilidades[0][1] * 100]
+                porcentajes.append(porcPartido)
+            fecha=partido['date']
+            fechaFormateada = fecha.replace('/','-')
+            jornadaActual = int(partido['round'])
+            p = Partido(idpartido=partido['id'], jornada=jornadaActual, fechapartido=fechaFormateada,
+                        horapartido=datetime.time(int(partido['hour']),int(partido['minute'])),equipo1=partido['local'],
+                        equipo2=partido['visitor'],porcentaje1=porcPartido[0],porcentajex=porcPartido[1],
+                        porcentaje2=porcPartido[2],competicion=partido['competition_name'],resultado=None)
+            p.save()
         else:
-            estadisticasConRes = statsPartido(partido['id'], partido['year'])
-            estadisticasSinRes = estadisticasConRes[:len(estadisticasConRes) - 1]
-            probabilidades = rfc.predict_proba(estadisticasSinRes)
-            porcPartido = [probabilidades[0] * 100, probabilidades[2] * 100, probabilidades[1] * 100]
-            porcentajes.append(porcPartido)
-        partidoToString = partido['local']+' - '+partido['visitor']
+            p = Partido.objects.get(idpartido=partido['id'])
+            
+#        partidoToString = partido['local']+' - '+partido['visitor']
+        partidoToString = p.__str__()
         partidos.append(partidoToString)
-        datos.append([partidoToString,porcPartido])
-    print(range(len(partidos)))
-    return render_to_response('base.html',{'porcentajes' : porcentajes, 'partidos' : partidos,'range': range(len(partidos)), 'datos' : datos})
+        porcentaje1=int(p.porcentaje1)
+        porcentajeX=int(p.porcentajex)
+        porcentaje2=int(p.porcentaje2)
+        if(porcentaje1 >= porcentajeX and porcentaje1 >= porcentaje2):
+            pronosticoRecomendado="Gana "+p.equipo1
+        elif(porcentajeX >= porcentaje1 and porcentajeX >= porcentaje2):
+            pronosticoRecomendado="Empate"
+        elif(porcentaje2 >= porcentaje1 and porcentaje2 >= porcentajeX):
+            pronosticoRecomendado="Gana "+p.equipo2
+        
+        listaPorcentajes=[porcentaje1,porcentajeX,porcentaje2]
+        fechaPartido=datetime.datetime.strptime(str(p.fechapartido),'%Y-%m-%d').strftime('%d/%m/%Y')
+        horaPartido=datetime.datetime.strptime(str(p.horapartido),'%H:%M:%S').strftime('%H:%M')
+        id=p.idpartido
+        
+        datos.append([partidoToString,listaPorcentajes,fechaPartido,horaPartido,pronosticoRecomendado,id])
+    
+    return render_to_response('base.html',{'datos' : datos})
 
 
 def crear(request):
@@ -64,7 +110,7 @@ def crear(request):
 
 
 def usuarios(request):
-    return render_to_response('index.html', {'usuarios' : Usuario.objects.all() })
+    return render_to_response('index.html', {'usuarios' : AuthUser.objects.all() })
 
 def usuario(request, usuario_id=1):
     return render_to_response('usuario.html', {'usuario' : Usuario.objects.get(idusuario=usuario_id) })
@@ -192,7 +238,7 @@ def generaFilasTemporada(liga,ano,c):
 def generaDataSetLiga(liga, anoComienzo):
     c = csv.writer(open("datosLiga"+liga+".csv","w"))
     c.writerow(['Posicion Local','%V Local','%E Local','%D Local','GF Local','GC Local','Forma Local','Enfr Directos Local','Enfr Directos Empates','Enfr Directos Visitante','Posicion Visitante','%V Visitante','%E Visitante','%D Visitante','GF Visitante','GC Visitante','Forma Visitante','Resultado'])
-    anoActual = datetime.now().year
+    anoActual = dt.now().year
     for ano in range(int(anoComienzo), anoActual+1):
         if (ano == 2013 or ano == 2014):
             continue
@@ -201,7 +247,10 @@ def generaDataSetLiga(liga, anoComienzo):
             generaFilasTemporada(liga, str(ano),c)
     
 def partidosJornadaActual(liga):
-    urlPartidosJornada = 'http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=matchs&key=27ddfff57083be19645416c230634b71&league='+liga+'&round=&order=twin&twolegged=1&year='
+    urlJornadaActual='http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=league_status&key=27ddfff57083be19645416c230634b71&id=1&group=1&year=2017'
+    jsondataJornadaActual = requests.get(urlJornadaActual).json()
+    jornadaActual = str(int(jsondataJornadaActual['league']['current_round']))
+    urlPartidosJornada = 'http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=matchs&key=27ddfff57083be19645416c230634b71&league='+liga+'&round='+jornadaActual+'&order=twin&twolegged=1&year='
     jsondataJornada = requests.get(urlPartidosJornada).json()
     partidos=jsondataJornada['match']
     return partidos
@@ -210,3 +259,99 @@ def detallesPartido(idPartido):
     urlPartido = 'http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=match&key=27ddfff57083be19645416c230634b71&id='+idPartido+'&year='
     jsondataPartido = requests.get(urlPartido).json()
     return jsondataPartido
+
+
+ 
+
+@ensure_csrf_cookie
+def register(request):
+    form = UserCreationForm(data=request.POST or None)
+    if request.method == 'POST' :
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('base.html')
+        else:
+            errores = form.error_messages
+            for error in errores :
+                print('errores :',error)
+    return render(request, 'registration/register.html', {'form': form})
+
+@csrf_protect
+def login(request):
+ 
+    # If we submitted the form...
+    if request.method == 'POST':
+ 
+        # Check that the test cookie worked (we set it below):
+        if request.session.test_cookie_worked():
+ 
+            # The test cookie worked, so delete it.
+            request.session.delete_test_cookie()
+ 
+            # In practice, we'd need some logic to check username/password
+            # here, but since this is an example...
+            return HttpResponse("You're logged in.")
+ 
+        # The test cookie failed, so display an error message. If this
+        # was a real site we'd want to display a friendlier message.
+        else:
+            return HttpResponse("Please enable cookies and try again.")
+  
+    # If we didn't post, send the test cookie along with the login form.
+    request.session.set_test_cookie()
+    return render(request,'foo/login_form.html')
+    
+def logout(request):
+    try:
+        del request.session['member_id']
+    except KeyError:
+        pass
+    return HttpResponse("You're logged out.")
+
+@ensure_csrf_cookie
+def mispronosticos(request):
+    
+    if request.user is not AnonymousUser:
+        iduser = AuthUser.objects.get(username=request.user).idusuario
+        if request.POST :
+            form = request.POST
+            
+            for partido,pron in form.items():
+                if not Apuesta.objects.filter(usuario_idusuario=iduser, partido_idpartido=partido):
+                    authuser = AuthUser.objects.get(username=request.user)
+                    part= Partido.objects.get(idpartido=partido)
+                    ap=Apuesta(idapuesta=None,usuario_idusuario=authuser,partido_idpartido=part,pronostico=pron,acierto_fallo=False)
+                    ap.save()
+    
+        apuestasUser = Apuesta.objects.filter(usuario_idusuario=iduser)    
+        
+    
+    
+    return render(request,'mis_pronosticos.html', RequestContext(request,{'pronostico':apuestasUser,}))
+    
+    
+#     if request.method == "POST":
+#         
+#         pronostico = request.post_data
+#         return redirect('success.html')
+#     else:
+#         
+#         return render(request, 'mis_pronosticos.html', RequestContext(request, {'pronostico':pronostico,  }))  
+
+
+def clasificacion(request):
+    apuestasAcertadas = Apuesta.objects.filter(acierto_fallo=1)
+    if(len(apuestasAcertadas)>0):
+        dictUsuarios={}
+        listaUsuariosRegistrados=AuthUser.objects.all()
+        for usuario in listaUsuariosRegistrados:
+            dictUsuarios[usuario.idusuario]=0
+        for apuesta in apuestasAcertadas:
+            dictUsuarios[apuesta.usuario_idusuario.idusuario] = dictUsuarios[apuesta.usuario_idusuario.idusuario]+1
+        items = dictUsuarios.items()
+        items.sort(key=lambda x: x[1])
+        print(items)
+        
+    return render(request,'clasificacion.html', RequestContext(request,{'usuarios':items,}))
+
+

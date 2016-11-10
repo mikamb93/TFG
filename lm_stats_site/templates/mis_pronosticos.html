@@ -1,0 +1,35 @@
+{% load staticfiles %}
+<html>
+<head>
+<link rel="stylesheet" href="{% static 'lmstats/style.css' %}">
+<title>BetEtsii</title>
+</head>
+<body>
+	<div id="centrado">
+		<header>
+
+			<h1 id="titulo">BetEtsii</h1>
+			<h2 id="descripcion">DESCRIPCION DE LA WEB</h2>
+
+			<div id="logotipo">LOGOTIPO</div>
+			<nav>
+				<ul id="menu-bar">
+					<li><a href="#">Partidos Analizados</a></li>
+					<li class="active"><a href="#">Mis Pronosticos</a></li>
+					<li><a href="#">Ranking de Usuarios</a></li>
+				</ul>
+			</nav>
+		</header>
+		<div id="contenido">
+			{% for pron in pronostico %}
+				<h5>{{ pron }}</h5>
+			{% endfor %}
+		</div>
+		<footer>
+			<section id="copyright">Datos Copyright</section>
+			<section id="contacto">Datos de Contacto</section>
+			<section id="enlaces">MapaWeb, Politica, etc.</section>
+		</footer>
+	</div>
+</body>
+</html>

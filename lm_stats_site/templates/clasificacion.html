@@ -25,14 +25,10 @@
 				{% csrf_token %}
 				<table>
 					<tr>
-						<td><strong>Fecha</strong></td>
-						<td><strong>Hora</strong></td>
-						<td><strong>Partido</strong></td>
-						<td><strong>%1</strong></td>
-						<td><strong>%X</strong></td>
-						<td><strong>%2</strong></td>
-						<td><strong>Pronostico Recomendado</strong></td>
-						<td><strong>Pronosticar</strong></td>
+						<td><strong>Ranking</strong></td>
+						<td><strong>Usuario</strong></td>
+						<td><strong>Porcentaje de acierto</strong></td>
+						<td><strong>Puntos</strong></td>
 					</tr>
 					{% for partido,porcentaje,fecha,hora,pronostico,id in datos %}
 					

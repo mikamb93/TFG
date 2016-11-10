@@ -1,0 +1,114 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_static %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+{% if app_list %}
+    {% for app in app_list %}
+        <div class="app-{{ app.app_label }} module">
+        <table>
+        <caption>
+            <a href="{{ app.app_url }}" class="section" title="{% blocktrans with name=app.name %}Models in the {{ name }} application{% endblocktrans %}">{{ app.name }}</a>
+        </caption>
+        {% for model in app.models %}
+            <tr class="model-{{ model.object_name|lower }}">
+            {% if model.admin_url %}
+                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
+            {% else %}
+                <th scope="row">{{ model.name }}</th>
+            {% endif %}
+
+            {% if model.add_url %}
+                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
+            {% else %}
+                <td>&nbsp;</td>
+            {% endif %}
+
+            {% if model.admin_url %}
+                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
+            {% else %}
+                <td>&nbsp;</td>
+            {% endif %}
+            </tr>
+        {% endfor %}
+        </table>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>{% trans "You don't have permission to edit anything." %}</p>
+{% endif %}
+</div>
+{% endblock %}
+
+{% block sidebar %}
+
+<div id="actualizar">
+	<div class="module" id="actualizar-module">
+		<form action="/admin/actualizar/" id="actualizarJornada" method="post">
+			<select name="jornada">
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">4</option>
+				<option value="5">5</option>
+				<option value="6">6</option>
+				<option value="7">7</option>
+				<option value="8">8</option>
+				<option value="9">9</option>
+				<option value="10">10</option>
+				<option value="11">11</option>
+				<option value="12">12</option>
+				<option value="13">13</option>
+				<option value="14">14</option>
+				<option value="15">15</option>
+				<option value="16">16</option>
+				<option value="17">17</option>
+				<option value="18">18</option>
+				<option value="19">19</option>
+			</select> 
+			<input type="submit">
+		</form>
+		<br> <a href="/admin/actualizar/" id="actualizar-link">Actualizar</a>
+	</div>
+</div>
+
+
+<div id="content-related">
+    <div class="module" id="recent-actions-module">
+        <h2>{% trans 'Recent Actions' %}</h2>
+        <h3>{% trans 'My Actions' %}</h3>
+            {% load log %}
+            {% get_admin_log 10 as admin_log for_user user %}
+            {% if not admin_log %}
+            <p>{% trans 'None available' %}</p>
+            {% else %}
+            <ul class="actionlist">
+            {% for entry in admin_log %}
+            <li class="{% if entry.is_addition %}addlink{% endif %}{% if entry.is_change %}changelink{% endif %}{% if entry.is_deletion %}deletelink{% endif %}">
+                {% if entry.is_deletion or not entry.get_admin_url %}
+                    {{ entry.object_repr }}
+                {% else %}
+                    <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>
+                {% endif %}
+                <br/>
+                {% if entry.content_type %}
+                    <span class="mini quiet">{% filter capfirst %}{{ entry.content_type }}{% endfilter %}</span>
+                {% else %}
+                    <span class="mini quiet">{% trans 'Unknown content' %}</span>
+                {% endif %}
+            </li>
+            {% endfor %}
+            </ul>
+            {% endif %}
+    </div>
+</div>
+{% endblock %}

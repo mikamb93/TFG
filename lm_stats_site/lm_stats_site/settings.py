@@ -47,7 +47,7 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+#    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -118,7 +118,7 @@ LANGUAGE_CODE = 'es'
 
 
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Madrid'
 
 USE_I18N = True
 
@@ -133,3 +133,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 # STATICFILES_DIRS = ['lmstats/static',]
 #STATIC_ROOT = ('lmstats/static')
+
+# Perfil de Usuario

@@ -41,6 +41,9 @@ def actualizar(request):
                     if(apuesta.pronostico == partidoBBDD.resultado):
                         apuesta.acierto_fallo = 1
                         apuesta.save()
+                        acertante = apuesta.usuario_idusuario
+                        acertante.puntos += 1
+                        acertante.save()
         
     return render_to_response(
         "admin/index.html",

@@ -1,30 +1,33 @@
-from django.shortcuts import render, render_to_response, RequestContext,\
-    redirect
-from lmstats.forms import UsuarioForm
-from django.http import HttpResponseRedirect
-from django.template.context_processors import csrf
-from lmstats.models import *
-import requests
-import urllib, json
-import urllib.request
 import csv
-import numpy as np
-from sklearn.cross_validation import train_test_split
-from sklearn.ensemble import RandomForestClassifier as RFC
-import time
 from datetime import datetime as dt
 import datetime
-from lmstats import clasificador
-from django.http.response import HttpResponse
+import time
+import urllib, json
+import urllib.request
+
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect,\
-    requires_csrf_token
+from django.contrib.auth import login as auth_login
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import AnonymousUser
+from django.contrib.sites.shortcuts import get_current_site
+from django.http import HttpResponseRedirect
+from django.http.response import HttpResponse
+from django.shortcuts import render, render_to_response, RequestContext, \
+    redirect, resolve_url
+from django.template.context_processors import csrf
 from django.template.defaultfilters import default
+from django.template.response import TemplateResponse
+from django.utils.http import is_safe_url
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect, \
+    requires_csrf_token
+import requests
+from sklearn.cross_validation import train_test_split
+from sklearn.ensemble import RandomForestClassifier as RFC
 
-
-
+from lmstats import clasificador
+from lmstats.forms import UsuarioForm
+from lmstats.models import *
+import numpy as np
 
 
 # Create your views here.
@@ -277,29 +280,57 @@ def register(request):
     return render(request, 'registration/register.html', {'form': form})
 
 @csrf_protect
-def login(request):
- 
-    # If we submitted the form...
-    if request.method == 'POST':
- 
-        # Check that the test cookie worked (we set it below):
-        if request.session.test_cookie_worked():
- 
-            # The test cookie worked, so delete it.
-            request.session.delete_test_cookie()
- 
-            # In practice, we'd need some logic to check username/password
-            # here, but since this is an example...
-            return HttpResponse("You're logged in.")
- 
-        # The test cookie failed, so display an error message. If this
-        # was a real site we'd want to display a friendlier message.
-        else:
-            return HttpResponse("Please enable cookies and try again.")
-  
-    # If we didn't post, send the test cookie along with the login form.
-    request.session.set_test_cookie()
-    return render(request,'foo/login_form.html')
+def login(request, authentication_form=AuthenticationForm):
+
+    if request.method == "POST":
+        form = authentication_form(request, data=request.POST)
+        if form.is_valid():
+
+            # Ensure the user-originating redirection url is safe.
+            if not is_safe_url(url=redirect_to, host=request.get_host()):
+                redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
+
+            # Okay, security check complete. Log the user in.
+            auth_login(request, form.get_user())
+
+            return HttpResponseRedirect(redirect_to)
+    else:
+        form = authentication_form(request)
+
+    current_site = get_current_site(request)
+
+    context = {
+        'form': form,
+        redirect_field_name: redirect_to,
+        'site': current_site,
+        'site_name': current_site.name,
+    }
+    if extra_context is not None:
+        context.update(extra_context)
+
+    return TemplateResponse(request, template_name, context)
+    
+#     # If we submitted the form...
+#     if request.method == 'POST':
+#  
+#         # Check that the test cookie worked (we set it below):
+#         if request.session.test_cookie_worked():
+#  
+#             # The test cookie worked, so delete it.
+#             request.session.delete_test_cookie()
+#  
+#             # In practice, we'd need some logic to check username/password
+#             # here, but since this is an example...
+#             return HttpResponse("You're logged in.")
+#  
+#         # The test cookie failed, so display an error message. If this
+#         # was a real site we'd want to display a friendlier message.
+#         else:
+#             return HttpResponse("Please enable cookies and try again.")
+#   
+#     # If we didn't post, send the test cookie along with the login form.
+#     request.session.set_test_cookie()
+#     return render(request,'foo/login_form.html')
     
 def logout(request):
     try:
@@ -340,18 +371,30 @@ def mispronosticos(request):
 
 
 def clasificacion(request):
-    apuestasAcertadas = Apuesta.objects.filter(acierto_fallo=1)
-    if(len(apuestasAcertadas)>0):
-        dictUsuarios={}
-        listaUsuariosRegistrados=AuthUser.objects.all()
-        for usuario in listaUsuariosRegistrados:
-            dictUsuarios[usuario.idusuario]=0
-        for apuesta in apuestasAcertadas:
-            dictUsuarios[apuesta.usuario_idusuario.idusuario] = dictUsuarios[apuesta.usuario_idusuario.idusuario]+1
-        items = dictUsuarios.items()
-        items.sort(key=lambda x: x[1])
-        print(items)
+#     apuestasAcertadas = Apuesta.objects.filter(acierto_fallo=1)
+#     if(len(apuestasAcertadas)>0):
+#         dictUsuarios={}
+#         listaUsuariosRegistrados=AuthUser.objects.all()
+#         for usuario in listaUsuariosRegistrados:
+#             dictUsuarios[usuario.idusuario]=0
+#         for apuesta in apuestasAcertadas:
+#             dictUsuarios[apuesta.usuario_idusuario.idusuario] = dictUsuarios[apuesta.usuario_idusuario.idusuario]+1
+#         items = dictUsuarios.items()
+#         items.sort(key=lambda x: x[1])
+#         print(items)
+
+    usuarios = AuthUser.objects.all().order_by('-puntos')
+    clasificacionUsuarios = []
+    for usuario in usuarios:
+        nick = usuario.username
+        print(nick)
+        puntos = usuario.puntos
+        apuestasRealizadas = len(Apuesta.objects.filter(usuario_idusuario=usuario.idusuario))
+        porcentajeAcierto = 0
+        if(apuestasRealizadas != 0):
+            porcentajeAcierto = puntos / apuestasRealizadas
+        clasificacionUsuarios.append([nick,str(porcentajeAcierto*100.0)+'%',puntos])
         
-    return render(request,'clasificacion.html', RequestContext(request,{'usuarios':items,}))
+    return render(request,'clasificacion.html', RequestContext(request,{'usuarios':clasificacionUsuarios,}))
 
 

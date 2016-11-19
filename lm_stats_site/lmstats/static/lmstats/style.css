@@ -1,24 +1,125 @@
+
+header {
+/* 	background-color: #a8ffa8; */
+	padding-left: 20px;
+	padding-top: 0px;
+	width: 85%;
+}
+
+
+#logo {
+	float: left;
+    margin: 80px 7px 20px 20px;
+    position: relative;
+    transform: scale(1.5);
+}
+
+#campofutbol {
+	margin-left:-16px;
+	transform: scale(0.8);
+	border-radius: 150px;
+}
+
+#descripcion {
+    color: white;
+    font-family: Trebuchet MS;
+    font-size: 28px;
+    font-variant: small-caps;
+    margin-left: 296px;
+    margin-top: 182px;
+    position: absolute;
+    text-align: center;
+    width: 381px;
+    z-index: 2;
+}
+
+#logincontainer {
+    float: right;
+    margin-right: 127px;
+    margin-top: -205px;
+    position: relative;
+    text-align: right;
+    width: 30%;
+}
+
+#logincontainer2 {
+	text-align: right;
+}
+
+#usuario, #contrasena {
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    display: inline-block;
+    float: right;
+    margin: 0 0 11px;
+    padding: 10px;
+    width: 47%;
+}
+
+
+.labellogin {
+    color: #2fc434;
+    display: inline-block;
+    float: left;
+    font-family: cursive;
+    margin: 0 0 11px;
+    padding: 9px 0 9px 17px;
+    text-align: right;
+    vertical-align: middle;
+    width: 46%;
+}
+
+
+#login {
+    background: #51db55 linear-gradient(to bottom, #51db55, #37cc3c) repeat scroll 0 0;
+    border-radius: 28px;
+    color: #ffffff;
+    font-family: cursive;
+    font-size: 20px;
+    margin-left: 13em;
+    padding: 3px 8px;
+    text-decoration: none;
+    text-shadow: 1px 1px 3px #666666;
+}
+
+#login:hover {
+	background: #37cc3c;
+	cursor:pointer;
+}
+
+
 #menu-bar {
-	width: 95%;
-	margin: 0px 0px 0px 0px;
-	padding: 6px 6px 4px 6px;
-	height: 43px;
-	line-height: 100%;
-	border-radius: 0px;
-	-webkit-border-radius: 0px;
-	-moz-border-radius: 0px;
-	box-shadow: 2px 2px 3px #666666;
-	-webkit-box-shadow: 2px 2px 3px #666666;
-	-moz-box-shadow: 2px 2px 3px #666666;
+/* 	width: 60%; */
+/* 	margin: 0px 0px 0px 0px; */
+/* 	padding: 6px 6px 4px 6px; */
+/* 	height: 35px; */
+/* 	line-height: 100%; */
+/* 	border-radius: 0px; */
+/* 	-webkit-border-radius: 0px; */
+/* 	-moz-border-radius: 0px; */
+/* 	box-shadow: 2px 2px 3px #666666; */
+/* 	-webkit-box-shadow: 2px 2px 3px #666666; */
+/* 	-moz-box-shadow: 2px 2px 3px #666666; */
 	background: #8B8B8B;
 	background: linear-gradient(top, #51DB56, #37CC3C);
 	background: -ms-linear-gradient(top, #51DB56, #37CC3C);
 	background: -webkit-gradient(linear, left top, left bottom, from(#51DB56),
 		to(#37CC3C));
-	background: -moz-linear-gradient(top, #51DB56, #37CC3C);
-	border: dashed 3px #6D6D6D;
-	position: relative;
-	z-index: 999;
+ 	background: -moz-linear-gradient(top, #51DB56, #37CC3C); */
+/* 	border: dashed 3px #6D6D6D; */
+/* 	position: relative; */
+/* 	z-index: 999; */
+/* 	background: rgba(0, 0, 0, 0) -moz-linear-gradient(center top , #51db56, #37cc3c) repeat scroll 0 0; */
+    border: 2px outset #6d6d6d;
+    border-radius: 48px;
+    box-shadow: 2px 2px 3px #666666;
+    height: 35px;
+    line-height: 100%;
+    margin: -13px 16px 16px;
+    padding: 6px 6px 4px;
+    position: relative;
+    width: 70%;
+    z-index: 999;
 }
 
 #menu-bar li {
@@ -31,13 +132,13 @@
 
 #menu-bar a {
 	font-weight: bold;
-	font-family: arial;
+	font-family: cursive;
 	font-style: normal;
-	font-size: 12px;
+	font-size: 23px;
 	color: #E7E5E5;
 	text-decoration: none;
 	display: block;
-	padding: 6px 20px 6px 20px;
+	padding: 8px 20px 8px 20px;
 	margin: 0;
 	margin-bottom: 6px;
 	border-radius: 10px;
@@ -167,4 +268,36 @@ html[xmlns] #menu-bar {
 
 * html #menu-bar {
 	height: 1%;
+}
+
+#ranking {
+	width: 50%;
+}
+
+table {
+    border-collapse: collapse;
+    width: 90%;
+    text-align: center;
+    font-family: Verdana, Geneva, sans-serif;
+}
+
+th {
+    background-color: #0d960a;
+    color: white;
+    height: 35px;
+}
+
+td {
+    height: 50px;
+    vertical-align: center;
+}
+
+tr:hover {background-color: #ff8080}
+
+tr:nth-child(even) {background-color: #c1ecb7}
+
+tr:nth-child(odd) {background-color: #9af18b}
+
+table, th, td {
+    border: 1px solid black;
 }

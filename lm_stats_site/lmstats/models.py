@@ -117,6 +117,7 @@ class AuthUser(models.Model):
     is_staff = models.IntegerField()
     is_active = models.IntegerField()
     date_joined = models.DateTimeField()
+    puntos = models.IntegerField()
 
     def __str__(self):
         return self.username

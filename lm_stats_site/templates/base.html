@@ -7,32 +7,47 @@
 <body>
 	<div id="centrado">
 		<header>
-
-			<h1 id="titulo">BetEtsii</h1>
-			<h2 id="descripcion">DESCRIPCION DE LA WEB</h2>
-
-			<div id="logotipo">LOGOTIPO</div>
+			<div id="headertop">
+				<div id="divlogotipo"><img id="logo"src="{% static "lmstats/logo_betetsii.png" %}" alt="Logo"/></div>
+				<div id="divdescripcion">
+					<h2 id="descripcion">Consulta las predicciones Realiza tus apuestas</h2>
+					<img id="campofutbol"src="{% static "lmstats/campofutbol.png" %}" alt="campo"/>
+				</div>
+				<div id="logincontainer">
+					<form action="accounts/login" method="post">{% csrf_token %}
+						<div class="container" id="logincontainer2">
+						  	<label class="labellogin" for="usuario"><b>Usuario</b></label>
+						  	<input type="text" name="usuario" id="usuario" required>
+							<br>
+						  	<label class="labellogin" for="contrasena"><b>Contrase&ntildea</b></label>
+						  	<input type="password" name="contrasena" id="contrasena" required>
+						
+						  	<button type="submit" id="login">Login</button>
+						</div>
+					</form>
+				</div>
+			</div>
 			<nav>
 				<ul id="menu-bar">
-					<li class="active"><a href="#">Partidos Analizados</a></li>
-					<li><a href="#">Mis Pronosticos</a></li>
-					<li><a href="#">Ranking de Usuarios</a></li>
+					<li class="active"><a href="/partidos">Partidos Analizados</a></li>
+					<li><a href="/mis_pronosticos">Mis Pronosticos</a></li>
+					<li><a href="/clasificacion">Ranking de Usuarios</a></li>
 				</ul>
 			</nav>
 		</header>
 		<div id="contenido">
 			<form action="/mis_pronosticos/" method="post">
 				{% csrf_token %}
-				<table>
+				<table id=partidos>
 					<tr>
-						<td><strong>Fecha</strong></td>
-						<td><strong>Hora</strong></td>
-						<td><strong>Partido</strong></td>
-						<td><strong>%1</strong></td>
-						<td><strong>%X</strong></td>
-						<td><strong>%2</strong></td>
-						<td><strong>Pronostico Recomendado</strong></td>
-						<td><strong>Pronosticar</strong></td>
+						<th><strong>Fecha</strong></th>
+						<th><strong>Hora</strong></th>
+						<th><strong>Partido</strong></th>
+						<th><strong>%1</strong></th>
+						<th><strong>%X</strong></th>
+						<th><strong>%2</strong></th>
+						<th><strong>Pronostico Recomendado</strong></th>
+						<th><strong>Pronosticar</strong></th>
 					</tr>
 					{% for partido,porcentaje,fecha,hora,pronostico,id in datos %}
 					

@@ -29,6 +29,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+MEDIA_ROOT = "C:/Users/mikam/git/pydemo_repo/lm_stats_site/images"
+MEDIA_URL = "/media/"
+
 
 # Application definition
 

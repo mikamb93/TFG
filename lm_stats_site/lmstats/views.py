@@ -286,14 +286,14 @@ def login(request, authentication_form=AuthenticationForm):
         form = authentication_form(request, data=request.POST)
         if form.is_valid():
 
-            # Ensure the user-originating redirection url is safe.
-            if not is_safe_url(url=redirect_to, host=request.get_host()):
-                redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
+#             # Ensure the user-originating redirection url is safe.
+#             if not is_safe_url(url=redirect_to, host=request.get_host()):
+#                 redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
 
             # Okay, security check complete. Log the user in.
             auth_login(request, form.get_user())
 
-            return HttpResponseRedirect(redirect_to)
+            return HttpResponseRedirect(request.template_name)
     else:
         form = authentication_form(request)
 
@@ -301,14 +301,11 @@ def login(request, authentication_form=AuthenticationForm):
 
     context = {
         'form': form,
-        redirect_field_name: redirect_to,
         'site': current_site,
         'site_name': current_site.name,
     }
-    if extra_context is not None:
-        context.update(extra_context)
 
-    return TemplateResponse(request, template_name, context)
+    return TemplateResponse(request, request.template_name, context)
     
 #     # If we submitted the form...
 #     if request.method == 'POST':

@@ -4,7 +4,7 @@ Created on 8 nov. 2016
 @author: mikamb93
 '''
 
-from lmstats.models import Partido, Apuesta
+from betEtsii.models import Partido, Apuesta
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.contrib.admin.views.decorators import staff_member_required

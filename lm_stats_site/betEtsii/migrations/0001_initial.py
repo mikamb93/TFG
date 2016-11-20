@@ -35,6 +35,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='computer',
             name='host_group',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='lmstats.HostGroup'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='betEtsii.HostGroup'),
         ),
     ]

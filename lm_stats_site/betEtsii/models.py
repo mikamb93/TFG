@@ -3,10 +3,10 @@ from enum import unique
 from MySQLdb.constants.FLAG import NOT_NULL, AUTO_INCREMENT
 from django.db.models.fields import Field
 from datetime import datetime
-import lmstats
+import betEtsii
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
-from lm_stats_site import settings
+from betetsii_site import settings
 
 
 # Create your models here.

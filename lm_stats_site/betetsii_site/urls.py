@@ -2,10 +2,10 @@
 from django.conf.urls import url, include
 
 from django.contrib import admin
-from lmstats import views, admin_views
+from betEtsii import views, admin_views
 from django.contrib.auth.views import login, logout
-from lmstats.views import register
-from lm_stats_site import settings
+from betEtsii.views import register
+from betetsii_site import settings
 
 
 admin.autodiscover()
@@ -14,7 +14,7 @@ urlpatterns = [
 
     
     url(r'^media/$', 'django.views.static.serve',{'document_root': settings.MEDIA_ROOT}),
-    url(r'^usuarios/', include('lmstats.urls')),
+    url(r'^usuarios/', include('betEtsii.urls')),
     
     url(r'^admin/actualizar/$', admin_views.actualizar),           
     url(r'^admin/', admin.site.urls),

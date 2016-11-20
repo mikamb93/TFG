@@ -4,7 +4,7 @@ Created on 15 jul. 2016
 @author: mikamb93
 '''
 from django import forms
-from lmstats.models import Usuario
+from betEtsii.models import Usuario
 
 
 class UsuarioForm(forms.ModelForm):

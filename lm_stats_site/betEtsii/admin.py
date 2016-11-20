@@ -1,5 +1,5 @@
 from django.contrib import admin
-from lmstats.models import *
+from betEtsii.models import *
 
 # Register your models here.
 

@@ -24,9 +24,9 @@ import requests
 from sklearn.cross_validation import train_test_split
 from sklearn.ensemble import RandomForestClassifier as RFC
 
-from lmstats import clasificador
-from lmstats.forms import UsuarioForm
-from lmstats.models import *
+from betEtsii import clasificador
+from betEtsii.forms import UsuarioForm
+from betEtsii.models import *
 import numpy as np
 
 

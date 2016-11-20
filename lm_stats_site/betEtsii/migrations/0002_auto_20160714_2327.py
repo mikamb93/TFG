@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('lmstats', '0001_initial'),
+        ('betEtsii', '0001_initial'),
     ]
 
     operations = [

@@ -6,7 +6,7 @@ from datetime import datetime
 import betEtsii
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
-from betetsii_site import settings
+from betEtsii_site import settings
 
 
 # Create your models here.

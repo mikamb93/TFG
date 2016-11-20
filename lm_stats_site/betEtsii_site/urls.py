@@ -5,7 +5,7 @@ from django.contrib import admin
 from betEtsii import views, admin_views
 from django.contrib.auth.views import login, logout
 from betEtsii.views import register
-from betetsii_site import settings
+from betEtsii_site import settings
 
 
 admin.autodiscover()

@@ -1,5 +1,5 @@
 import csv
-from datetime import datetime as dt
+from datetime import datetime as dt, date
 import datetime
 import time
 import urllib, json
@@ -85,8 +85,8 @@ def my_view(request):
             pronosticoRecomendado="Gana "+p.equipo2
         
         listaPorcentajes=[porcentaje1,porcentajeX,porcentaje2]
-        fechaPartido=datetime.datetime.strptime(str(p.fechapartido),'%Y-%m-%d').strftime('%d/%m/%Y')
-        horaPartido=datetime.datetime.strptime(str(p.horapartido),'%H:%M:%S').strftime('%H:%M')
+        fechaPartido=dt.strptime(str(p.fechapartido),'%Y-%m-%d').strftime('%d/%m/%Y')
+        horaPartido=dt.strptime(str(p.horapartido),'%H:%M:%S').strftime('%H:%M')
         id=p.idpartido
         
         datos.append([partidoToString,listaPorcentajes,fechaPartido,horaPartido,pronosticoRecomendado,id])
@@ -338,23 +338,25 @@ def logout(request):
 
 @ensure_csrf_cookie
 def mispronosticos(request):
-    
-    if request.user is not AnonymousUser:
+    iduser=request.user.username
+    if not iduser == '':
         iduser = AuthUser.objects.get(username=request.user).idusuario
         if request.POST :
             form = request.POST
-            
             for partido,pron in form.items():
-                if not Apuesta.objects.filter(usuario_idusuario=iduser, partido_idpartido=partido):
-                    authuser = AuthUser.objects.get(username=request.user)
-                    part= Partido.objects.get(idpartido=partido)
-                    ap=Apuesta(idapuesta=None,usuario_idusuario=authuser,partido_idpartido=part,pronostico=pron,acierto_fallo=False)
-                    ap.save()
-    
-        apuestasUser = Apuesta.objects.filter(usuario_idusuario=iduser)    
-        
-    
-    
+                apuestaYaRealizada = Apuesta.objects.get(usuario_idusuario=iduser, partido_idpartido=partido)
+                fechaPartido = Partido.objects.get(idpartido=partido).fechapartido
+                horaPartido = Partido.objects.get(idpartido=partido).horapartido
+                fechaActual = dt.strptime(time.strftime("%Y-%m-%d"), "%Y-%m-%d").date()
+                horaActual = dt.strptime(time.strftime("%H:%M:%S"), "%H:%M:%S").time()
+                if not apuestaYaRealizada:
+                    if fechaActual <= fechaPartido:
+                        if horaActual < horaPartido:
+                            authuser = AuthUser.objects.get(username=request.user)
+                            part= Partido.objects.get(idpartido=partido)
+                            ap=Apuesta(idapuesta=None,usuario_idusuario=authuser,partido_idpartido=part,pronostico=pron,acierto_fallo=False)
+                            ap.save()
+    apuestasUser = Apuesta.objects.filter(usuario_idusuario=iduser)
     return render(request,'mis_pronosticos.html', RequestContext(request,{'pronostico':apuestasUser,}))
     
     

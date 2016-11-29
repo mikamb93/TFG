@@ -64,7 +64,7 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': ['C:/Users/mikam/Desktop/TFG/workspace/betEtsii_site/templates',
                  os.path.join(PROJECT_PATH, 'templates'),
-                 'C:/Users/mikam/git/pydemo_repo/betEtsii_site/templates'],
+                 'C:/Users/mikam/git/pydemo_repo/lm_stats_site/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

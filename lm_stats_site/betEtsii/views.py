@@ -1,7 +1,7 @@
 import csv
-from datetime import datetime as dt, date
-import datetime
-import time
+import datetime as dt
+# import datetime
+import time as timeModule
 import urllib, json
 import urllib.request
 
@@ -42,6 +42,7 @@ def my_view(request):
 #    p = Partido(idpartido=123,fechapartido=datetime.today(),horapartido=datetime.time(datetime.now()),equipo1='Betis',equipo2='Celta',porcentaje1=50,porcentajex=20,porcentaje2=30,competicion='Liga',resultado=None)
 #    p.save()
     for partido in partidosJornada:
+        
         if (len(Partido.objects.filter(idpartido=int(partido['id']))) == 0):
             
             detallespartido=detallesPartido(str(partido['id']))
@@ -64,7 +65,7 @@ def my_view(request):
             fechaFormateada = fecha.replace('/','-')
             jornadaActual = int(partido['round'])
             p = Partido(idpartido=partido['id'], jornada=jornadaActual, fechapartido=fechaFormateada,
-                        horapartido=datetime.time(int(partido['hour']),int(partido['minute'])),equipo1=partido['local'],
+                        horapartido=dt.time(int(partido['hour']),int(partido['minute'])),equipo1=partido['local'],
                         equipo2=partido['visitor'],porcentaje1=porcPartido[0],porcentajex=porcPartido[1],
                         porcentaje2=porcPartido[2],competicion=partido['competition_name'],resultado=None)
             p.save()
@@ -73,6 +74,7 @@ def my_view(request):
             
 #        partidoToString = partido['local']+' - '+partido['visitor']
         partidoToString = p.__str__()
+        print(partidoToString)
         partidos.append(partidoToString)
         porcentaje1=int(p.porcentaje1)
         porcentajeX=int(p.porcentajex)
@@ -85,13 +87,13 @@ def my_view(request):
             pronosticoRecomendado="Gana "+p.equipo2
         
         listaPorcentajes=[porcentaje1,porcentajeX,porcentaje2]
-        fechaPartido=dt.strptime(str(p.fechapartido),'%Y-%m-%d').strftime('%d/%m/%Y')
-        horaPartido=dt.strptime(str(p.horapartido),'%H:%M:%S').strftime('%H:%M')
+        fechaPartido=dt.datetime.strptime(str(p.fechapartido),'%Y-%m-%d').strftime('%d/%m/%Y')
+        horaPartido=dt.datetime.strptime(str(p.horapartido),'%H:%M:%S').strftime('%H:%M')
         id=p.idpartido
         
         datos.append([partidoToString,listaPorcentajes,fechaPartido,horaPartido,pronosticoRecomendado,id])
     
-    return render_to_response('base.html',{'datos' : datos})
+    return render_to_response('partidos.html',{'datos' : datos})
 
 
 def crear(request):
@@ -120,12 +122,12 @@ def usuario(request, usuario_id=1):
 
 
 def mostrardatos(request):
-#     r = requests.get('http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=tables&key=27ddfff57083be19645416c230634b71&league=1&group=1&year=2016&round=30')
+#     r = requests.get('http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=tables&key=4b45eb362a5e4edcf7f75e5ce015a0ea&league=1&group=1&year=2016&round=30')
 #     jsonData = r.content
 #     jsonToPython = json.loads()
 #     print (r.content)
     
-    url = 'http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=tables&key=27ddfff57083be19645416c230634b71&league=1&group=1&year=2016&round=30'
+    url = 'http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=tables&key=4b45eb362a5e4edcf7f75e5ce015a0ea&league=1&group=1&year=2016&round=30'
 #     jsondata = requests.get(url).json()
 #     for equipo in jsondata['table']:
 #         if equipo['team'] == 'Barcelona':
@@ -151,7 +153,7 @@ def formaEquipo(forma):
 
 def datosEquipo(idEquipo,jornada,liga,ano):
     jornadaParaAnalisis=str(int(jornada)-1) #Los datos para el analisis tienen que ser los reales justo antes del partido
-    url = 'http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=tables&key=27ddfff57083be19645416c230634b71&league='+liga+'&round='+jornadaParaAnalisis+'&year='+ano
+    url = 'http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=tables&key=4b45eb362a5e4edcf7f75e5ce015a0ea&league='+liga+'&round='+jornadaParaAnalisis+'&year='+ano
     jsondata = requests.get(url).json()
     for equipo in jsondata['table']:
         if equipo['id']==idEquipo:
@@ -167,15 +169,15 @@ def datosEquipo(idEquipo,jornada,liga,ano):
     return datos
 
 def enfrentamientosDirectos(idPartido,idEquipo1,idEquipo2,ano):
-    url = 'http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&lang=es&format=json&req=teams_history&key=27ddfff57083be19645416c230634b71&id='+idPartido+'&year='+ano+'&teams='+idEquipo1+','+idEquipo2
+    url = 'http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&lang=es&format=json&req=teams_history&key=4b45eb362a5e4edcf7f75e5ce015a0ea&id='+idPartido+'&year='+ano+'&teams='+idEquipo1+','+idEquipo2
     jsondata = requests.get(url).json()
     if (jsondata['matches'] is not None):
         ultimos5 = jsondata['matches'][0:5]
     else:
         return [0,0,0]
     
-    urlEq1 = 'http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=team&key=27ddfff57083be19645416c230634b71&id='+idEquipo1
-    urlEq2 = 'http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=team&key=27ddfff57083be19645416c230634b71&id='+idEquipo2
+    urlEq1 = 'http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=team&key=4b45eb362a5e4edcf7f75e5ce015a0ea&id='+idEquipo1
+    urlEq2 = 'http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=team&key=4b45eb362a5e4edcf7f75e5ce015a0ea&id='+idEquipo2
     jsondataEq1 = requests.get(urlEq1).json()
     jsondataEq2 = requests.get(urlEq2).json()
     equipo1=jsondataEq1['team']['nameShow']
@@ -199,7 +201,7 @@ def enfrentamientosDirectos(idPartido,idEquipo1,idEquipo2,ano):
 
 
 def statsPartido(idPartido,ano):
-    url = 'http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=match&key=27ddfff57083be19645416c230634b71&id='+idPartido+'&year='+ano
+    url = 'http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=match&key=4b45eb362a5e4edcf7f75e5ce015a0ea&id='+idPartido+'&year='+ano
     partido = requests.get(url).json()
     idEquipo1 = partido['datateam1']
     idEquipo2 = partido['datateam2']
@@ -221,14 +223,14 @@ def statsPartido(idPartido,ano):
 
 
 def generaFilasTemporada(liga,ano,c):
-    urlultimajornada = 'http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=matchs&key=27ddfff57083be19645416c230634b71&league='+liga+'&round=&order=twin&twolegged=1&year='+ano
+    urlultimajornada = 'http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=matchs&key=4b45eb362a5e4edcf7f75e5ce015a0ea&league='+liga+'&round=&order=twin&twolegged=1&year='+ano
     jsondataultimajornada = requests.get(urlultimajornada).json()
     numJornadas = int(jsondataultimajornada['match'][0]['round'])
 #    matrizPartidos = []
     i=0
 #    c.writerow(['Posicion Local','%V Local','%E Local','%D Local','GF Local','GC Local','Forma Local','Enfr Directos Local','Enfr Directos Empates','Enfr Directos Visitante','Posicion Visitante','%V Visitante','%E Visitante','%D Visitante','GF Visitante','GC Visitante','Forma Visitante','Resultado'])
     for jornada in range(6,numJornadas+1): #Necesitamos tener todas las filas con 5 partidos de forma actual
-        urlPartidosJornada = 'http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=matchs&key=27ddfff57083be19645416c230634b71&league='+liga+'&round='+str(jornada)+'&order=twin&twolegged=1&year='+ano
+        urlPartidosJornada = 'http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=matchs&key=4b45eb362a5e4edcf7f75e5ce015a0ea&league='+liga+'&round='+str(jornada)+'&order=twin&twolegged=1&year='+ano
         jsondataJornada = requests.get(urlPartidosJornada).json()
         for partido in jsondataJornada['match']:
             estadisticasPartido=statsPartido(partido['id'], partido['year'])
@@ -241,7 +243,7 @@ def generaFilasTemporada(liga,ano,c):
 def generaDataSetLiga(liga, anoComienzo):
     c = csv.writer(open("datosLiga"+liga+".csv","w"))
     c.writerow(['Posicion Local','%V Local','%E Local','%D Local','GF Local','GC Local','Forma Local','Enfr Directos Local','Enfr Directos Empates','Enfr Directos Visitante','Posicion Visitante','%V Visitante','%E Visitante','%D Visitante','GF Visitante','GC Visitante','Forma Visitante','Resultado'])
-    anoActual = dt.now().year
+    anoActual = dt.datetime.now().year
     for ano in range(int(anoComienzo), anoActual+1):
         if (ano == 2013 or ano == 2014):
             continue
@@ -250,16 +252,16 @@ def generaDataSetLiga(liga, anoComienzo):
             generaFilasTemporada(liga, str(ano),c)
     
 def partidosJornadaActual(liga):
-    urlJornadaActual='http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=league_status&key=27ddfff57083be19645416c230634b71&id=1&group=1&year=2017'
+    urlJornadaActual='http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=league_status&key=4b45eb362a5e4edcf7f75e5ce015a0ea&id=1&group=1&year=2017'
     jsondataJornadaActual = requests.get(urlJornadaActual).json()
     jornadaActual = str(int(jsondataJornadaActual['league']['current_round']))
-    urlPartidosJornada = 'http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=matchs&key=27ddfff57083be19645416c230634b71&league='+liga+'&round='+jornadaActual+'&order=twin&twolegged=1&year='
+    urlPartidosJornada = 'http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=matchs&key=4b45eb362a5e4edcf7f75e5ce015a0ea&league='+liga+'&round='+jornadaActual+'&order=twin&twolegged=1&year='
     jsondataJornada = requests.get(urlPartidosJornada).json()
     partidos=jsondataJornada['match']
     return partidos
 
 def detallesPartido(idPartido):
-    urlPartido = 'http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=match&key=27ddfff57083be19645416c230634b71&id='+idPartido+'&year='
+    urlPartido = 'http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=match&key=4b45eb362a5e4edcf7f75e5ce015a0ea&id='+idPartido+'&year='
     jsondataPartido = requests.get(urlPartido).json()
     return jsondataPartido
 
@@ -293,7 +295,7 @@ def login(request, authentication_form=AuthenticationForm):
             # Okay, security check complete. Log the user in.
             auth_login(request, form.get_user())
 
-            return HttpResponseRedirect(request.template_name)
+            return HttpResponseRedirect('/clasificacion')
     else:
         form = authentication_form(request)
 
@@ -305,7 +307,7 @@ def login(request, authentication_form=AuthenticationForm):
         'site_name': current_site.name,
     }
 
-    return TemplateResponse(request, request.template_name, context)
+    return TemplateResponse(request, 'registration/login.html', context)
     
 #     # If we submitted the form...
 #     if request.method == 'POST':
@@ -347,8 +349,8 @@ def mispronosticos(request):
                 apuestaYaRealizada = Apuesta.objects.get(usuario_idusuario=iduser, partido_idpartido=partido)
                 fechaPartido = Partido.objects.get(idpartido=partido).fechapartido
                 horaPartido = Partido.objects.get(idpartido=partido).horapartido
-                fechaActual = dt.strptime(time.strftime("%Y-%m-%d"), "%Y-%m-%d").date()
-                horaActual = dt.strptime(time.strftime("%H:%M:%S"), "%H:%M:%S").time()
+                fechaActual = dt.datetime.strptime(timeModule.strftime("%Y-%m-%d"), "%Y-%m-%d").date()
+                horaActual = dt.datetime.strptime(timeModule.strftime("%H:%M:%S"), "%H:%M:%S").time()
                 if not apuestaYaRealizada:
                     if fechaActual <= fechaPartido:
                         if horaActual < horaPartido:

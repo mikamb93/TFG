@@ -14,16 +14,15 @@ import requests
 def actualizar(request):
     data=request.POST
     jornada = int(data['jornada'])
-    urlEstadoLiga = 'http://apiclient.resultados-futbol.com/scripts/api/api.php?key=27ddfff57083be19645416c230634b71&tz=Europe/Madrid&format=json&req=league_status&id=1&group=1&year=2017'
+    urlEstadoLiga = 'http://apiclient.resultados-futbol.com/scripts/api/api.php?key=4b45eb362a5e4edcf7f75e5ce015a0ea&tz=Europe/Madrid&format=json&req=league_status&id=1&group=1&year=2017'
     jsondataEstado = requests.get(urlEstadoLiga).json()
     estadoActual = int(jsondataEstado['league']['current_round'])
-    print(Partido.objects.get(idpartido=96233).resultado)
     partidosBBDD=Partido.objects.filter(jornada=jornada).filter(resultado__isnull=True)
     print(len(partidosBBDD))
     print(jornada<=estadoActual)
     if((len(partidosBBDD)!=0)&(jornada<=estadoActual)):
         print('entra')
-        urlPartidosJornada = 'http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=matchs&key=27ddfff57083be19645416c230634b71&league=1&round='+str(jornada)+'&order=twin&twolegged=1&year='
+        urlPartidosJornada = 'http://www.resultados-futbol.com/scripts/api/api.php?tz=Europe/Madrid&format=json&req=matchs&key=4b45eb362a5e4edcf7f75e5ce015a0ea&league=1&round='+str(jornada)+'&order=twin&twolegged=1&year='
         jsondataJornada = requests.get(urlPartidosJornada).json()
         partidos=jsondataJornada['match']
         for partido in partidos:

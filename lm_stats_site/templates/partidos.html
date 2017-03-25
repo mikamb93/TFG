@@ -1,0 +1,40 @@
+{% extends "base.html" %} 
+
+{% block menubar %}
+	<li class="active"><a href="/partidos">Partidos Analizados</a></li>
+	<li><a href="/mis_pronosticos">Mis Pronosticos</a></li>
+	<li><a href="/clasificacion">Ranking de Usuarios</a></li>
+{% endblock %} 
+
+{% block content %}
+	<form action="/mis_pronosticos/" method="post">
+		{% csrf_token %}
+		<table id=partidos>
+			<tr>
+				<th><strong>Fecha</strong></th>
+				<th><strong>Hora</strong></th>
+				<th><strong>Partido</strong></th>
+				<th><strong>%1</strong></th>
+				<th><strong>%X</strong></th>
+				<th><strong>%2</strong></th>
+				<th><strong>Pronostico Recomendado</strong></th>
+				<th><strong>Pronosticar</strong></th>
+			</tr>
+			{% for partido,porcentaje,fecha,hora,pronostico,id in datos %}
+			<tr>
+				<td>{{ fecha }}</td>
+				<td>{{ hora }}</td>
+				<td>{{ partido }}</td>
+				<td>{{ porcentaje.0 }}</td>
+				<td>{{ porcentaje.1 }}</td>
+				<td>{{ porcentaje.2 }}</td>
+				<td>{{ pronostico }}</td>
+				<td><input id=radio1 type="radio" name="{{ id }}" value="1">1
+					<input id=radioX type="radio" name="{{ id }}" value="X">X <input
+					id=radio2 type="radio" name="{{ id }}" value="2">2</td>
+			</tr>
+			{% endfor %}
+		</table>
+		<input type="submit" value="Pronosticar">
+	</form>
+{% endblock %}

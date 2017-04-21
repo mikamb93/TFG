@@ -1,15 +1,22 @@
 {% extends "base.html" %} 
 
 {% block menubar %}
-	<li class="active"><a href="/partidos">Partidos Analizados</a></li>
-	<li><a href="/mis_pronosticos">Mis Pronosticos</a></li>
-	<li><a href="/clasificacion">Ranking de Usuarios</a></li>
+	<div id="divMenuBar">
+		<nav>
+			<ul id="menu-bar">
+				<li class="active"><a href="/partidos">Partidos Analizados</a></li>
+				<li><a href="/mis_pronosticos">Mis Pronosticos</a></li>
+				<li><a href="/clasificacion">Ranking de Usuarios</a></li>
+			</ul>
+		</nav>
+	</div>
 {% endblock %} 
 
 {% block content %}
-	<form action="/mis_pronosticos/" method="post">
-		{% csrf_token %}
-		<table id=partidos>
+
+	<h1 id="numJornada">Jornada {{ jornada }}</h1>
+	<form action="/mis_pronosticos/" method="post">{% csrf_token %}
+		<table id=partidos class="center">
 			<tr>
 				<th><strong>Fecha</strong></th>
 				<th><strong>Hora</strong></th>
@@ -17,10 +24,10 @@
 				<th><strong>%1</strong></th>
 				<th><strong>%X</strong></th>
 				<th><strong>%2</strong></th>
-				<th><strong>Pronostico Recomendado</strong></th>
-				<th><strong>Pronosticar</strong></th>
+				<th><strong>Pron&oacutestico</br>Recomendado</strong></th>
+				<th><strong>Tu Pron&oacutestico</strong></th>
 			</tr>
-			{% for partido,porcentaje,fecha,hora,pronostico,id in datos %}
+			{% for partido,porcentaje,fecha,hora,pronostico,id,sePuedeApostar in datos %}
 			<tr>
 				<td>{{ fecha }}</td>
 				<td>{{ hora }}</td>
@@ -29,12 +36,18 @@
 				<td>{{ porcentaje.1 }}</td>
 				<td>{{ porcentaje.2 }}</td>
 				<td>{{ pronostico }}</td>
-				<td><input id=radio1 type="radio" name="{{ id }}" value="1">1
-					<input id=radioX type="radio" name="{{ id }}" value="X">X <input
-					id=radio2 type="radio" name="{{ id }}" value="2">2</td>
+				<td>
+				{% if sePuedeApostar %}
+					<input id=radio1 type="radio" name="{{ id }}" value="1">1
+					<input id=radioX type="radio" name="{{ id }}" value="X">X 
+					<input id=radio2 type="radio" name="{{ id }}" value="2">2
+				{% else %}
+					No disponible
+				{% endif %}	
+				</td>
 			</tr>
 			{% endfor %}
 		</table>
-		<input type="submit" value="Pronosticar">
+		<input type="submit" class="button" value="Apostar">
 	</form>
 {% endblock %}

@@ -1,13 +1,65 @@
 {% extends "base.html" %} 
 
+
+
 {% block menubar %}
-	<li><a href="/partidos">Partidos Analizados</a></li>
-	<li class="active"><a href="/mis_pronosticos">Mis Pronosticos</a></li>
-	<li><a href="/clasificacion">Ranking de Usuarios</a></li>
+	<div id="divMenuBar">
+		<nav>
+			<ul id="menu-bar">
+				<li><a href="/partidos">Partidos Analizados</a></li>
+				<li class="active"><a href="/mis_pronosticos">Mis Pronosticos</a></li>
+				<li><a href="/clasificacion">Ranking de Usuarios</a></li>
+			</ul>
+		</nav>
+	</div>
 {% endblock %} 
 
 {% block content %}
-	{% for pron in pronostico %}
-		<h5>{{ pron }}</h5>
-	{% endfor %}
+{% load static %} {% static "lmstats/aciertoV.png" as aciertoV %}
+{% if user.is_authenticated %}
+	<div id="tableContainer" class="tableContainer">
+		<table id=mispronosticos class="center">
+			<thead class="fixedHeader">
+				<tr>
+					<th class="columnaJornada"><strong>Jornada</strong></th>
+					<th class="columnaPartido"><strong>Partido</strong></th>
+					<th class="columnaApuesta"><strong>Apuesta</strong></th>
+					<th class="columnaResultado"><strong>Resultado</strong></th>
+					<th class="columnaAcierto"><strong>Acierto</strong></th>
+				</tr>
+			</thead>
+			<tbody class="scrollContent">
+				{% for pron in pronosticos %}
+				<tr{% if pron.acierto_fallo == True %} style="font-weight: bold;" {% endif %}>
+					<td class="columnaJornada">{{ pron.partido_idpartido.jornada }}</td>
+					<td class="columnaPartido">{{ pron.partido_idpartido }}</td>
+					<td class="columnaApuesta">{{ pron.pronostico }}</td>
+					<td class="columnaResultado">
+						{% if pron.partido_idpartido.resultadoreal != None %}
+							{{ pron.partido_idpartido.resultadoreal }}
+						{% endif %}
+					</td>
+					<td class="columnaAcierto">
+						{% if pron.acierto_fallo == True %}
+							<img id="aciertoV" src="{{ aciertoV }}"/>
+						{% endif %}
+					</td>
+							
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+	
+		<table id="mispuntos">
+			<tr>
+				<th><strong>Mis puntos</strong></th>
+			</tr>
+			<tr>
+				<td>{{ mispuntos }}</td>
+			</tr>
+		</table>
+{% else %}
+	<p id="mensajeMisPronosticos">Reg&iacute;strate o inicia sesi&oacute;n para acceder a esta secci&oacute;n.</p>
+{% endif %}
 {% endblock %}

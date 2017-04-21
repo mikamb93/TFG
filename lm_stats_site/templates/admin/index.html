@@ -53,7 +53,7 @@
 
 <div id="actualizar">
 	<div class="module" id="actualizar-module">
-		<form action="/admin/actualizar/" id="actualizarJornada" method="post">
+		<form action="/admin/actualizar/" id="actualizarJornada" method="post">{% csrf_token %}
 			<select name="jornada">
 				
 				<option value="1">1</option>
@@ -98,7 +98,7 @@
 			</select> 
 			<input type="submit">
 		</form>
-		<br> <a href="/admin/actualizar/" id="actualizar-link">Actualizar</a>
+		<br> <a href="/admin/alimentar/" id="actualizar-link">Alimentar Partidos Temporada</a>
 	</div>
 </div>
 

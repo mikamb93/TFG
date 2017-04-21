@@ -1,9 +1,22 @@
+{% extends "base.html" %} 
 
- 
-{% block title %}Create an account{% endblock %}
+
+{% block menubar %}
+	<div id="divMenuBar">
+		<nav>
+			<ul id="menu-bar">
+				<li><a href="/partidos">Partidos Analizados</a></li>
+				<li><a href="/mis_pronosticos">Mis Pronosticos</a></li>
+				<li><a href="/clasificacion">Ranking de Usuarios</a></li>
+			</ul>
+		</nav>
+	</div>		
+{% endblock %} 
  
 {% block content %}
-  <h1>Create an account</h1>
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600' rel='stylesheet' type='text/css'>
+<link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel="stylesheet">
+<!--   <h1>Create an account</h1>
   <form action="." method="post">
   	{% csrf_token %}
   	
@@ -46,5 +59,47 @@
     <label for="id_password2">Password (again):</label> {{ form.password2 }}
  
     <input type="submit" value="Create the account" />
+  </form> -->
+  
+  <div class="testbox">
+
+	{% if form.errors %}
+	    {% for field in form %}
+	        {% for error in field.errors %}
+	            <div class="alert alert-danger">
+	                <strong>{{ error|escape }}</strong>
+	            </div>
+	        {% endfor %}
+	    {% endfor %}
+	    {% for error in form.non_field_errors %}
+	        <div class="alert alert-danger">
+	            <strong>{{ error|escape }}</strong>
+	        </div>
+	    {% endfor %}
+	{% endif %}
+	
+	
+	
+    {% if form.error_dict %}
+      <p class="error">Please correct the errors below.</p>
+    {% endif %}
+
+    {% if form.username.errors %}
+      {{ form.username.html_error_list }}
+    {% endif %}
+
+  <form action="/accounts/register/" method="post" id="registerForm">{% csrf_token %}
+	  <!-- <label id="icon" for="email"><i class="icon-mail"></i></label>
+	  <input type="email" name="email" id="email" placeholder="Email" required/> -->
+	  <label id="icon" for="username"><i class="icon-user"></i></label>
+	  <input type="text" name="username" id="username" placeholder="Usuario" required/>
+	  <label id="icon" for="password1"><i class="icon-shield"></i></label>
+	  <input type="password" name="password1" id="password1" placeholder="Password" required/>
+	  <label id="icon" for="password2"><i class="icon-shield"></i></label>
+	  <input type="password" name="password2" id="password2" placeholder="Repite tu password" required/>
+	   <a href="#" class="button">Registraaaaarse</a>
+	  <input type="submit" class="button" value="Registrarse">
   </form>
+</div>
+  
 {% endblock %}

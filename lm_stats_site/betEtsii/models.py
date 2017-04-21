@@ -42,7 +42,8 @@ class Partido(models.Model):
     porcentaje2 = models.FloatField(blank=True, null=True)
     competicion = models.CharField(max_length=45, blank=True, null=True)
     resultado = models.CharField(max_length=45, blank=True, null=True)
-
+    resultadoreal = models.CharField(max_length=45, blank=True, null=True)
+    
     class Meta:
         managed = False
         db_table = 'partido'
@@ -105,7 +106,7 @@ class DjangoContentType(models.Model):
 
 
 class AuthUser(models.Model):
-    REQUIRED_FIELDS = ('username','password','first_name','last_name','email')
+    REQUIRED_FIELDS = ('username','password')
     idusuario = models.CharField(max_length=128,db_column='id',primary_key=True)
     password = models.CharField(max_length=128)
     last_login = models.DateTimeField(blank=True, null=True)

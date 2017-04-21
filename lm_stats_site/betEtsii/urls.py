@@ -8,8 +8,4 @@ from django.conf.urls import url
 from betEtsii import views
 
 urlpatterns = [
-    url(r'^todos/$', views.usuarios),
-    url(r'^obtener/(?P<usuario_id>\d+)/$', views.usuario),
-    url(r'^datos/$', views.mostrardatos),
-    
 ]

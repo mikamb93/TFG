@@ -25,9 +25,9 @@
 				<th><strong>%X</strong></th>
 				<th><strong>%2</strong></th>
 				<th><strong>Pron&oacutestico</br>Recomendado</strong></th>
-				<th><strong>Tu Pron&oacutestico</strong></th>
+				<th><strong>Resultado</strong></th>
 			</tr>
-			{% for partido,porcentaje,fecha,hora,pronostico,id,sePuedeApostar in datos %}
+			{% for partido,porcentaje,fecha,hora,pronostico,id,sePuedeApostar,resultado in datos %}
 			<tr>
 				<td>{{ fecha }}</td>
 				<td>{{ hora }}</td>
@@ -41,6 +41,8 @@
 					<input id=radio1 type="radio" name="{{ id }}" value="1">1
 					<input id=radioX type="radio" name="{{ id }}" value="X">X 
 					<input id=radio2 type="radio" name="{{ id }}" value="2">2
+				{% elif resultado %}
+					{{ resultado }}
 				{% else %}
 					No disponible
 				{% endif %}	

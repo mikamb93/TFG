@@ -19,9 +19,8 @@ urlpatterns = [
     url(r'^admin/actualizar/$', admin_views.actualizar),           
     url(r'^admin/', admin.site.urls),
     url(r'^partidos/', views.listarPartidos),
-    url(r'^crear/', views.crear, name='crear'),
     
-    url(r'^accounts/login/$',  login),
+    url(r'^accounts/login/$',  views.login),
     url(r'^accounts/logout/$', logout, {'next_page': '/partidos/'}),
     url(r'^accounts/register1/$', register_user1),
     url(r'^accounts/register2/$', register_user),

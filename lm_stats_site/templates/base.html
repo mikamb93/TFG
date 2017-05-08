@@ -25,7 +25,7 @@
 							<label class="labellogin" for="username"><b>Usuario</b></label> <input type="text" name="username" id="username" required> <br>
 							<label class="labellogin" for="password"><b>Contrase&ntildea</b></label>
 							<input type="password" name="password" id="password" required>
-							<a href="/accounts/register" id="registrarse">Registrarse</a>
+							<a href="/accounts/register1" id="registrarse">Registrarse</a>
 
 							<button type="submit" id="login">Login</button>
 						</div>
@@ -38,9 +38,9 @@
 							<button type="submit" id="login">Logout</button>
 						</div>
 					</form>
-					{% endif %}
-					{% if user.is_staff %}
-						<a href="/admin" id="administrar">Administrar BetETSII</a>
+						{% if user.is_staff %}
+							<a href="/admin" id="administrar">Administrar BetETSII</a>
+						{% endif %}
 					{% endif %}
 				</div>
 			</div>

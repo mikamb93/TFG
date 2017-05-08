@@ -5,9 +5,10 @@ Created on 15 jul. 2016
 '''
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-import datetime as dt
+from django.contrib.auth.hashers import make_password
 
 from betEtsii.models import Usuario, AuthUser
+import datetime as dt
 
 
 class UsuarioForm(forms.ModelForm):
@@ -43,7 +44,7 @@ class MyRegistrationForm(UserCreationForm):
         user.is_active = True
         user.date_joined = dt.datetime.now()
         user.puntos = 0
-        user.password = self.cleaned_data['password1']
+        user.password = make_password(self.cleaned_data['password1'])
         
         if commit:
             user.save()

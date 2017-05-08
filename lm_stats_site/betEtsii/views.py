@@ -1,17 +1,23 @@
-from django.contrib.auth import login as auth_login
+from django.contrib.auth import login as auth_login, REDIRECT_FIELD_NAME
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.views import deprecate_current_app
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import HttpResponseRedirect
 from django.http.response import HttpResponse
-from django.shortcuts import render, render_to_response, RequestContext
+from django.shortcuts import render, render_to_response, RequestContext, \
+    resolve_url
 from django.template.context_processors import csrf
 from django.template.response import TemplateResponse
+from django.utils.http import is_safe_url
+from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect, \
     requires_csrf_token
+from django.views.decorators.debug import sensitive_post_parameters
 
 from betEtsii import views_utils
 from betEtsii.forms import UsuarioForm, MyRegistrationForm
 from betEtsii.models import AuthUser, Usuario, Apuesta, Partido
+from betEtsii_site import settings
 import datetime as dt
 import time as timeModule
 
@@ -61,30 +67,41 @@ def register_user(request):
     if request.method == 'POST':
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect('/partidos')
+            return render(request, 'registration/register.html', {'registerOK': True})
         else:
             errores = form.error_messages
             for error in errores :
                 print('errores :',error)
     
 #     args['form'] = MyRegistrationForm()
-    return render(request, 'registration/register.html', {'form': form})
+    return render(request, 'registration/register.html', {'form': form,'registerOK':False})
 
-# @csrf_protect
-def login(request, authentication_form=AuthenticationForm):
+@deprecate_current_app
+@sensitive_post_parameters()
+@csrf_protect
+@never_cache
+def login(request, template_name='mis_pronosticos.html',
+          redirect_field_name=REDIRECT_FIELD_NAME,
+          authentication_form=AuthenticationForm,
+          extra_context=None):
+    """
+    Displays the login form and handles the login action.
+    """
+    redirect_to = request.POST.get(redirect_field_name,
+                                   request.GET.get(redirect_field_name, ''))
 
     if request.method == "POST":
         form = authentication_form(request, data=request.POST)
         if form.is_valid():
 
-#             # Ensure the user-originating redirection url is safe.
-#             if not is_safe_url(url=redirect_to, host=request.get_host()):
-#                 redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
+            # Ensure the user-originating redirection url is safe.
+            if not is_safe_url(url=redirect_to, host=request.get_host()):
+                redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
 
             # Okay, security check complete. Log the user in.
             auth_login(request, form.get_user())
 
-            return HttpResponseRedirect('/clasificacion')
+            return HttpResponseRedirect(redirect_to)
     else:
         form = authentication_form(request)
 
@@ -92,11 +109,42 @@ def login(request, authentication_form=AuthenticationForm):
 
     context = {
         'form': form,
+        redirect_field_name: redirect_to,
         'site': current_site,
         'site_name': current_site.name,
     }
+    if extra_context is not None:
+        context.update(extra_context)
 
-    return TemplateResponse(request, 'registration/login.html', context)
+    return TemplateResponse(request, template_name, context)
+
+# # @csrf_protect
+# def login(request, authentication_form=AuthenticationForm):
+# 
+#     if request.method == "POST":
+#         form = authentication_form(request, data=request.POST)
+#         if form.is_valid():
+# 
+# #             # Ensure the user-originating redirection url is safe.
+# #             if not is_safe_url(url=redirect_to, host=request.get_host()):
+# #                 redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
+# 
+#             # Okay, security check complete. Log the user in.
+#             auth_login(request, form.get_user())
+# 
+#             return HttpResponseRedirect('/clasificacion')
+#     else:
+#         form = authentication_form(request)
+# 
+#     current_site = get_current_site(request)
+# 
+#     context = {
+#         'form': form,
+#         'site': current_site,
+#         'site_name': current_site.name,
+#     }
+# 
+#     return TemplateResponse(request, 'registration/login.html', context)
     
 def logout(request):
     try:
@@ -147,7 +195,7 @@ def clasificacion(request):
         porcentajeAcierto = 0
         if(apuestasRealizadas != 0):
             porcentajeAcierto = puntos / apuestasRealizadas
-        clasificacionUsuarios.append([nick,str(porcentajeAcierto*100.0)+'%',puntos])
+        clasificacionUsuarios.append([nick,"%0.2f" % (porcentajeAcierto*100.0)+' %',puntos])
         
     return render(request,'clasificacion.html', RequestContext(request,{'usuarios':clasificacionUsuarios,}))
 

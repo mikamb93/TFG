@@ -11,6 +11,7 @@ import requests
 from betEtsii.models import Partido
 import datetime as dt
 import time as timeModule
+from MySQLdb.constants.FIELD_TYPE import NULL
 
 
 def formaEquipo(forma):
@@ -52,8 +53,9 @@ def listarPartidos():
         if datetimeActual > datetimePartido:
             sePuedeApostar = False
         id=p.idpartido
+        resultado=p.resultadoreal
         
-        datos.append([partidoToString,listaPorcentajes,fechaPartido,horaPartido,pronosticoRecomendado,id,sePuedeApostar])
+        datos.append([partidoToString,listaPorcentajes,fechaPartido,horaPartido,pronosticoRecomendado,id,sePuedeApostar,resultado])
     return datos, jornadaActual
 
 def enfrentamientosDirectos(idPartido,idEquipo1,idEquipo2,ano):

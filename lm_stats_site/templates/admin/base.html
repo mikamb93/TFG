@@ -14,7 +14,7 @@
 					</a>
 				</div>
 				<div id="divdescripcion">
-					<h2 id="descripcion">Consulta las predicciones Realiza tus apueestas</h2>
+					<h2 id="descripcion">Consulta las predicciones Realiza tus apuestas</h2>
 					<img id="campofutbol" src="{% static "lmstats/campofutbol.png" %}" alt="campo" />
 				</div>
 
@@ -25,7 +25,7 @@
 							<label class="labellogin" for="username"><b>Usuario</b></label> <input type="text" name="username" id="username" required> <br>
 							<label class="labellogin" for="password"><b>Contrase&ntildea</b></label>
 							<input type="password" name="password" id="password" required>
-							<a href="/accounts/register1" id="registrarse">Registrarose</a>
+							<a href="/accounts/register1" id="registrarse">Registrarse</a>
 
 							<button type="submit" id="login">Login</button>
 						</div>
@@ -33,7 +33,7 @@
 					{% else %}
 					<form action="/accounts/logout/" method="post">{% csrf_token %}
 						<div class="container" id="logoutcontainer">
-							<label class="labellogin" for="usuario"><b>Bienvenido {{ user }}</b></label><br>
+							<label class="labellogin"><b>Bienvenido {{ user }}</b></label><br>
 							<input type="hidden" name="next" value="{{ next|escape }}" />
 							<button type="submit" id="login">Logout</button>
 						</div>
@@ -44,10 +44,78 @@
 					{% endif %}
 				</div>
 			</div>
-			{% block menubar %} {% endblock %}
+			<div id="divMenuBar">
+				<nav>
+					<ul id="menu-bar">
+						<li><a href="/partidos">Partidos Analizados</a></li>
+						<li><a href="/mis_pronosticos">Mis Pronosticos</a></li>
+						<li><a href="/clasificacion">Ranking de Usuarios</a></li>
+					</ul>
+				</nav>
+			</div>		
 		</header>
 		<div id="contenido">
-			{% block content %} {% endblock %}
+			{% if user.is_staff %}
+			<div id="actualizar">
+				<div class="module" id="actualizar-module">
+					<form action="/admin/actualizar/" id="actualizarJornada" method="post">{% csrf_token %}
+						<fieldset class="fieldset">
+							<legend>Actualizar jornada</legend>
+							<label for="jornada">Jornada</label>
+							<select name="jornada" id="jornadaselect">
+								
+								<option value="1">1</option>
+								<option value="2">2</option>
+								<option value="3">3</option>
+								<option value="4">4</option>
+								<option value="5">5</option>
+								<option value="6">6</option>
+								<option value="7">7</option>
+								<option value="8">8</option>
+								<option value="9">9</option>
+								<option value="10">10</option>
+								<option value="11">11</option>
+								<option value="12">12</option>
+								<option value="13">13</option>
+								<option value="14">14</option>
+								<option value="15">15</option>
+								<option value="16">16</option>
+								<option value="17">17</option>
+								<option value="18">18</option>
+								<option value="19">19</option>
+								<option value="20">20</option>
+								<option value="21">21</option>
+								<option value="22">22</option>
+								<option value="23">23</option>
+								<option value="24">24</option>
+								<option value="25">25</option>
+								<option value="26">26</option>
+								<option value="27">27</option>
+								<option value="28">28</option>
+								<option value="29">29</option>
+								<option value="30">30</option>
+								<option value="31">31</option>
+								<option value="32">32</option>
+								<option value="33">33</option>
+								<option value="34">34</option>
+								<option value="35">35</option>
+								<option value="36">36</option>
+								<option value="37">37</option>
+								<option value="38">38</option>
+							</select> </br>
+							<input type="submit" value="Actualizar">
+						</fieldset>
+					</form>
+				</div>
+				<div id="alimentarPartidos">
+					<fieldset class="fieldset">
+						<legend>Alimentar los partidos</br>de la temporada</legend>
+						<a href="/admin/alimentar/" id="alimentarPartidosButton">Alimentar</a>
+					</fieldset>
+				</div>
+			</div>
+			<div id="test"></div>
+			{% endif %}
 		</div>
 		<footer>
 			

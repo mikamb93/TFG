@@ -15,8 +15,27 @@
 {% endblock %} 
 
 {% block content %}
+
+{% if form.errors %}
+	<div id="errorlogin">
+    {% for field in form %}
+        {% for error in field.errors %}
+            <div class="alert">
+                <strong>{{ error|escape }}</strong>
+            </div>
+        {% endfor %}
+    {% endfor %}
+    {% for error in form.non_field_errors %}
+        <div class="alert">
+            <strong>{{ error|escape }}</strong>
+        </div>
+    {% endfor %}
+    </div>
+{% endif %}
+
 {% load static %} {% static "lmstats/aciertoV.png" as aciertoV %}
 {% if user.is_authenticated %}
+	{% if pronosticos %}
 	<div id="tableContainer" class="tableContainer">
 		<table id=mispronosticos class="center">
 			<thead class="fixedHeader">
@@ -59,6 +78,9 @@
 				<td>{{ mispuntos }}</td>
 			</tr>
 		</table>
+	{% else %}
+		<p id="mensajeMisPronosticosVacio">Comienza a hacer tus apuestas en la secci&oacute;n de <a href="/partidos">Partidos Analizados</a></p>
+	{% endif %}
 {% else %}
 	<p id="mensajeMisPronosticos">Reg&iacute;strate o inicia sesi&oacute;n para acceder a esta secci&oacute;n.</p>
 {% endif %}
